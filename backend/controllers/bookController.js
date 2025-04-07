@@ -65,3 +65,11 @@ exports.getAllBooks = (req, res) => {
     .then((books) => res.status(200).json(books))
     .catch((error) => res.status(500).json({ error }));
 };
+
+exports.getBestRatedBooks = (req, res) => {
+    Book.find()
+    .sort({ averageRating: -1 }) // tri décroissant
+    .limit(3) // top 3
+    .then(books => res.status(200).json(books))
+    .catch(error => res.status(400).json({ error }));
+};
