@@ -2,7 +2,6 @@ const Book = require('../models/Book');
 const fs = require('fs');
 const path = require('path');
 
-// Créer un livre
 exports.createBook = async (req, res) => {
   console.log('Requête reçue !');
   console.log('req.body:', req.body);
@@ -11,8 +10,9 @@ exports.createBook = async (req, res) => {
 
   // Vérification si le champ book est présent
   if (!req.body.book) {
-    console.error('Erreur : le champ book est manquant.');
-    return res.status(400).json({ message: 'Le livre est requis !' });
+    return res.status(400).json({
+      message: 'Tous les champs sont requis, veuillez vérifier si c\'est le cas.',
+    });
   }
 
   try {
@@ -21,8 +21,16 @@ exports.createBook = async (req, res) => {
 
     // Vérification si le fichier image est présent
     if (!req.file) {
-      console.error('Erreur : fichier image manquant.');
-      return res.status(400).json({ message: 'L’image est requise !' });
+      return res.status(400).json({
+        message: 'L\'image est requise, veuillez ajouter une image.',
+      });
+    }
+
+    // Vérification si tous les champs nécessaires sont présents
+    if (!bookData.title || !bookData.author || !bookData.year || !bookData.genre) {
+      return res.status(400).json({
+        message: 'Tous les champs (titre, auteur, année, genre) sont requis.',
+      });
     }
 
     // Création d'une nouvelle instance du livre
@@ -36,7 +44,7 @@ exports.createBook = async (req, res) => {
     res.status(201).json({ message: 'Livre enregistré avec succès !' });
   } catch (error) {
     console.error('Erreur serveur:', error);
-    res.status(400).json({ error });
+    res.status(500).json({ message: 'Erreur serveur, veuillez réessayer plus tard.' });
   }
 };
 
@@ -54,7 +62,7 @@ exports.modifyBook = (req, res) => {
         }
     // Supprimer _id s'il est présent dans req.body
     delete req.body._id;
-    
+
     Book.updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id })
       .then(() => {
         console.log('Livre modifié');
