@@ -27,9 +27,20 @@ exports.createBook = async (req, res) => {
     }
 
     // Vérification si tous les champs nécessaires sont présents
-    if (!bookData.title || !bookData.author || !bookData.year || !bookData.genre) {
+    if (
+      !bookData.title ||
+      !bookData.author ||
+      !bookData.year ||
+      !bookData.genre ||
+      !bookData.ratings ||
+      !Array.isArray(bookData.ratings) ||
+      bookData.ratings.length === 0 ||
+      typeof bookData.ratings[0].grade !== 'number' ||
+      bookData.ratings[0].grade < 1 ||
+      bookData.ratings[0].grade > 5
+    ) {
       return res.status(400).json({
-        message: 'Tous les champs (titre, auteur, année, genre) sont requis.',
+        message: 'Tous les champs (titre, auteur, année, genre, note entre 1 et 5) sont requis.',
       });
     }
 
